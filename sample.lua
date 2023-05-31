@@ -1,11 +1,11 @@
-function buildSequence()
+--EVERYTHING HERE WAS MADE BY MASTERSP2000/MASTERKURIETA
+function buildSequence() -- This function builds a colorSequence based off of how many bars the player has created in the Colour Menu.
 	local barCount = 0
 	for i,v in pairs(script.Parent.ColourFrame.Frame:GetChildren()) do
 		if v:IsA("ImageButton") then
 			if string.sub(v.Name, 0, 8) == "stillbar" then 
 				barCount += 1
 				v.Name = "stillbar_"..barCount 
-				--print(barCount)
 			end
 		end
 	end
@@ -35,7 +35,7 @@ function buildSequence()
 	
 end
 
-function buildNumSequenceV2()
+function buildNumSequenceV2() -- This function builds a number sequence based on the user's inputs in the advanced menu.
 	local numberFrame = script.Parent.NumberFrame
 	local NumSeq = nil
 	local barcount = 0 
@@ -48,9 +48,6 @@ function buildNumSequenceV2()
 				local success, e = pcall(function()
 					if type(tonumber(v.TextBox.Text)) == "number" then
 						v.NumberValue.Value = v.TextBox.Text
-					--[[else
-						warn("An error occured whislt trying to set the value of: "..v.Name.." to: "..v.TextBox.Text)
-						]]
 					end
 				end)
 				if success then
@@ -65,7 +62,7 @@ function buildNumSequenceV2()
 		-- success here
 		return funcSucc
 	end
-	local function SetBarcount(targetFrame)
+	local function SetBarcount(targetFrame) -- Loops through an object and organises the names of frames. E.G If a frame/bar is deleted, the ones left will be renamed appropiately.
 		for i,v in pairs(targetFrame:GetChildren()) do
 			if string.sub(v.Name, 0, 8) == "stillbar" then
 				barcount += 1
@@ -73,15 +70,14 @@ function buildNumSequenceV2()
 			end
 		end
 	end
-	local function GetKeypoints(targetFrame)
+	local function GetKeypoints(targetFrame) -- Function that reads the values from the textboxes and creates and returns a numberKey/Sequence
 		local NumKey = nil
 		local returnedSet = nil
-		if barcount > 2 then
+		if barcount > 2 then --Failsafe to stop the player from creating/applying more than 3 bars
 			local s, e = pcall(function()
 				targetFrame:FindFirstChild("stillbar_3")
 			end)
 			if s then
-				print("deleted")
 				targetFrame:FindFirstChild("stillbar_3"):Destroy()
 			end
 		end
@@ -104,34 +100,30 @@ function buildNumSequenceV2()
 				return NumKey
 			end
 			if not success then
-				
-				--warn("\nAn error occured in 'GetKeypoints': \n\n"..e)
 				return nil
 			end
 		end
 	end
-	local function SetSequence(selected)
+	local function SetSequence(selected) -- The values from the GetKeypoints function are read by this function and then applied to the placeholder particle emitter.
 		local sizeKeypoints = nil
 		local targetFrame = numberFrame:FindFirstChild("Frame"..selected)
 		local returned = nil
 		SetBarcount(targetFrame)
 		local success, e = pcall(function()
-			if type(tonumber(targetFrame.startButton.TextBox.Text)) ~= "number" then return false end
+			if type(tonumber(targetFrame.startButton.TextBox.Text)) ~= "number" then return false end --Failsafe to stop the player from entering a letter where an integer should be
 			returned = GetKeypoints(targetFrame)
 		end)
 		if success then
 			if returned ~= nil then
-				--print(returned)
 				NumSeq = NumberSequence.new(returned)
 				if script.Parent.NumberFrame.SwapButton.Text == "Size" then
-					folder.NumberSequence.SizeEmitter.Size = NumSeq
+					folder.NumberSequence.SizeEmitter.Size = NumSeq --If the player has size selected, it will assign their values to the Size of a particle emitter placeholder.
 				end
 				if script.Parent.NumberFrame.SwapButton.Text == "Transparency" then
 					folder.NumberSequence.TransparencyEmitter.Transparency = NumSeq
 				end
 				
 			end
-			--actually assign numseq lol
 			
 		end
 		if not success then
@@ -147,18 +139,17 @@ function buildNumSequenceV2()
 	end
 end
 
-function createImage(ImageID, bool)
+function createImage(ImageID, bool) -- Simple function to allow the player to add their own particle texture to the game using an rbxasset ID.
 	if script.Parent.ImageFrame.ScrollingFrame:FindFirstChild("Image_"..ImageID) then return end
 	
-	local image = Instance.new("ImageButton")
+	local image = Instance.new("ImageButton") --Creates an image button, which displays the player's particle texture.
 	image.Parent = script.Parent.ImageFrame.ScrollingFrame
 	image.Name = "Image_"..ImageID
 	image.Image = ImageID
-	--image.BackgroundTransparency = 1
 	image.BorderColor3 = Color3.fromRGB(0, 124, 169)
 	image.BorderSizePixel = 0
 	
-	image.MouseButton1Click:Connect(function()
+	image.MouseButton1Click:Connect(function() -- function that allows the player to switch between different particle textures.
 		if selectedImage == nil then
 			print(image)
 			image.BorderSizePixel = 3
@@ -176,7 +167,8 @@ function createImage(ImageID, bool)
 		selectedImage = image
 	end
 end
-UIS.InputBegan:Connect(function(input)
+
+UIS.InputBegan:Connect(function(input) -- Function that checks the textbox where the player would enter an rbxasset id.
 	if input.KeyCode == Enum.KeyCode.Return then
 		if Textbox.Text ~= nil then
 			if string.sub(Textbox.Text, 0, 13) == "rbxassetid://" then
@@ -191,9 +183,9 @@ UIS.InputBegan:Connect(function(input)
 				end
 				if succ == true then
 					local infoTab = info
-					if infoTab["AssetTypeId"] == 1 or 13 then
+					if infoTab["AssetTypeId"] == 1 or 13 then -- Roblox only displays asset 1 (Images) on imageLabels/Buttons. Entering a 13(decal) will not work
 						warn("valid ID")
-						createImage(Textbox.Text)
+						createImage(Textbox.Text) -- Creates an imagebutton if the assetID is valid
 						Textbox.Text = ""
 					end
 				end
@@ -204,7 +196,6 @@ UIS.InputBegan:Connect(function(input)
 					number = tonumber(Textbox.Text)
 				end)
 				if success then
-					--print("roblox ID")
 					if Textbox.Parent.Parent.Visible == false then return end
 					if Textbox.Text == "" then return end
 					local succ, info = pcall(MarketplaceService.GetProductInfo, MarketplaceService, tonumber(Textbox.Text))
@@ -213,12 +204,9 @@ UIS.InputBegan:Connect(function(input)
 					end
 					if succ == true then
 						local infoTab = info
-						--print(info)
-						if infoTab["AssetTypeId"] == 1 or 13 then
+						if infoTab["AssetTypeId"] == 1 or 13 then -- Roblox only displays asset 1 (Images) on imageLabels/Buttons. Entering a 13(decal) will not work
 							warn("valid ID")
-							--print(info)
-							createImage("rbxassetid://"..Textbox.Text)
-							--selectedImage = Textbox.Text
+							createImage("rbxassetid://"..Textbox.Text) -- Creates an imagebutton if the assetID is valid
 							Textbox.Text = ""
 						end
 					end
