@@ -15,22 +15,22 @@ function buildSequence() -- This function builds a colorSequence based off of ho
 			ColorSequenceKeypoint.new(tonumber(interiorColourFrame.Frame.stillbar_1.ColorValue.Time.Value), interiorColourFrame.Frame.stillbar_1.ColorValue.Value),
 			ColorSequenceKeypoint.new(1, interiorColourFrame.Frame.endButton.ColorValue.Value)
 		}
-		gradient.UIGradient.Color = ColorSequence.new(colorKeypoints)
+		gradient.UIGradient.Color = ColorSequence.new(colorKeypoints) -- changes the gradient of the fat bar so the player can see their colour gradient in real time!!!!!!!
 	end
-	if barCount == 2 then
+	if barCount == 2 then -- do the same thing as the code above but with 2 bars and a failsafe to stop them from entering keypoints in the wrong order, which would cause a fatal error
 		if tonumber(interiorColourFrame.Frame.stillbar_1.ColorValue.Time.Value) > tonumber(interiorColourFrame.Frame.stillbar_2.ColorValue.Time.Value) then
-			sendError("Error,", "You must not place your second marker before the first marker.\nThe marker will be destroyed.")
+			sendError("Error,", "You must not place your second marker before the first marker.\nThe marker will be destroyed.") -- sendError shows a notification to the player explaining what happened
 			interiorColourFrame.Frame:FindFirstChild("stillbar_2"):Destroy()
 			barCount = 1
 			return
 		end
-		local colorKeypoints = {
+		local colorKeypoints = { -- setting colour keypoints to whatever the player entered for each bar. 
 			ColorSequenceKeypoint.new(0, interiorColourFrame.Frame.startButton.ColorValue.Value),
 			ColorSequenceKeypoint.new(tonumber(interiorColourFrame.Frame.stillbar_1.ColorValue.Time.Value), interiorColourFrame.Frame.stillbar_1.ColorValue.Value),
 			ColorSequenceKeypoint.new(tonumber(interiorColourFrame.Frame.stillbar_2.ColorValue.Time.Value), interiorColourFrame.Frame.stillbar_2.ColorValue.Value),
 			ColorSequenceKeypoint.new(1, interiorColourFrame.Frame.endButton.ColorValue.Value)
 		}
-		gradient.UIGradient.Color = ColorSequence.new(colorKeypoints)	
+		gradient.UIGradient.Color = ColorSequence.new(colorKeypoints)	-- changes the gradient of the fat bar so the player can see their colour gradient in real time!!!!!!!
 	end
 	
 end
@@ -82,22 +82,20 @@ function buildNumSequenceV2() -- This function builds a number sequence based on
 			end
 		end
 		if barcount == 1 then
-			local success, e = pcall(function()
-				returnedSet = SetValues(targetFrame)
-				NumKey = {
+			local success, e = pcall(function() --pcall to stop any errors and only proceed if the code can sucessfully make a numbersequence with the values the player has entered, if the player entered any numbers- it will not run
+				returnedSet = SetValues(targetFrame) -- SetValues returns true or false
+				NumKey = { -- sets the variable NumKey to the keypoints and whatever so it can be returned to the main function
 					NumberSequenceKeypoint.new(0, tonumber(targetFrame.startButton.NumberValue.Value)),
 					NumberSequenceKeypoint.new(tonumber(targetFrame.stillbar_1.NumberValue.Time.Value), tonumber(targetFrame.stillbar_1.NumberValue.Value)),
 					NumberSequenceKeypoint.new(1, tonumber(targetFrame.endButton.NumberValue.Value))
 				}
 			end)
 			if success then
-				if returnedSet == nil then
-
+				if returnedSet == nil then --If there are no errors but the function SetValues cannot change all the strings into number values, an error is returned.
 					warn("\nAn error occured in 'GetKeypoints' when function: 'SetValues' was called. Returned: \n\n"..returnedSet.."\nError:\n"..e)
 					return nil
 				end
-				
-				return NumKey
+				return NumKey -- returns numkey 
 			end
 			if not success then
 				return nil
